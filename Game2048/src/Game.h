@@ -2,25 +2,24 @@
 #define GAME_H
 
 #include "Board.h"
+#include <iosfwd>
 
 class Game {
 public:
-	Game();
+	Game(std::ostream& os);
 	void run();
 
 private:
-	void init();
-	void print();
-	void handleInput();
-	bool isGameOver();
-	bool isBoardFull();
+	char handleInput();
+	void display();
 	void reset();
 	void handleWin();
 	void handleLose();
 
+private:
 	Board board;
-	bool gameOver;
-	int score;
+	int score = 0;
+	std::ostream& m_displayDevice;
 };
 
 #endif // GAME_H

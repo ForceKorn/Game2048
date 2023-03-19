@@ -1,91 +1,67 @@
-#include <iostream>
-#include <string>
-#include <cstdlib>
-#include <ctime>
 #include "Game.h"
 
-using namespace std;
+#include <iostream>
+#include <string>
 
-Game::Game() : board(), gameOver(false), score(0) {}
+Game::Game(std::ostream& display)
+	: board(), score(0), m_displayDevice(display) {}
 
-void Game::run() {
-	init();
-	print();
+void Game::run() 
+{
+	reset();
+	display();
 
-	while (!gameOver) {
-		handleInput();
-		print();
+	while (board.canMove())
+	{
+		const int direction = handleInput();
+		board.move(direction);
+		display();
 
-		if (isGameOver() || isBoardFull() || board.hasTileWithValue(2048)) {
-			gameOver = true;
+		const bool isFull = board.isFull();
+		const bool isVictory = board.containsValue(2048);
+		if (isVictory)
+		{
+			handleWin();
+			return;
+		}
 
-			if (board.hasTileWithValue(2048)) {
-				handleWin();
-			}
-			else {
-				handleLose();
-			}
+		if (isFull)
+		{
+			handleLose();
+			return;
 		}
 	}
 }
 
-void Game::init() {
-	board.clear();
-	board.addRandomTile();
-	board.addRandomTile();
-	score = 0;
-	gameOver = false;
-}
-
-void Game::print() 
+void Game::display()
 {
 	system("cls"); // clear console
 
-	cout << "Score: " << score << endl;
-	cout << board << endl;
+	m_displayDevice << "Score: " << score << '\n';
+	board.display(m_displayDevice);
 }
 
-void Game::handleInput() {
-	cout << "Enter a move (w/a/s/d): ";
-	string input;
-	cin >> input;
-
-	if (input == "w") {
-		score += board.moveUp();
-	}
-	else if (input == "a") {
-		score += board.moveLeft();
-	}
-	else if (input == "s") {
-		score += board.moveDown();
-	}
-	else if (input == "d") {
-		score += board.moveRight();
-	}
+char Game::handleInput()
+{
+	m_displayDevice << "Enter a move (w/a/s/d): ";
+	
+	std::string input;
+	std::getline(std::cin, input);
+	return input.empty() ? 0 : input.front();
 }
 
-bool Game::isGameOver() {
-	return !board.canMove();
-}
-
-bool Game::isBoardFull() {
-	return board.isFull();
-}
-
-void Game::reset() {
-	board.clear();
-	board.addRandomTile();
-	board.addRandomTile();
+void Game::reset() 
+{
+	board.reset();
 	score = 0;
-	gameOver = false;
 }
 
-void Game::handleWin() {
-	cout << "Congratulations! You have reached 2048!" << endl;
-	gameOver = true;
+void Game::handleWin() 
+{
+	m_displayDevice << "Congratulations! You have reached 2048!\n";
 }
 
-void Game::handleLose() {
-	cout << "Game over. You lose." << endl;
-	gameOver = true;
+void Game::handleLose() 
+{
+	m_displayDevice << "Game over. You lose.\n";
 }

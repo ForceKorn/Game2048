@@ -1,18 +1,16 @@
 #ifndef TILE_H
 #define TILE_H
 
+#include <iosfwd>
+
 class Tile 
 {
 public:
-	Tile();
-	explicit Tile(int val);
+	Tile(int number = 0);
+	void display(std::ostream& os);
 
-	int getValue() const;
-	void setValue(int val);
-	bool isEmpty() const;
-
-private:
-	int value;
+public:
+	int m_number = 0;
 };
 
 #endif // TILE_H

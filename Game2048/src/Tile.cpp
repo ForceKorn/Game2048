@@ -1,13 +1,9 @@
 #include "Tile.h"
+#include <iostream>
 
-int Tile::getValue() const {
-	return value;
-}
+Tile::Tile(int number) : m_number(number) {}
 
-void Tile::setValue(int val) {
-	value = val;
-}
-
-bool Tile::isEmpty() const {
-	return value == 0;
+void Tile::display(std::ostream& os)
+{
+	os << m_number;
 }
