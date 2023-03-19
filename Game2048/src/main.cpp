@@ -1,7 +1,11 @@
 #include <iostream>
+#include "Game.h"
 
 
-int main()
+int main() 
 {
+	Game game;
+	game.run();
+
 	return 0;
 }
