@@ -6,20 +6,22 @@
 
 class Game {
 public:
-	Game(std::ostream& os);
+	Game(std::ostream& os, std::istream& is);
 	void run();
 
 private:
-	char handleInput();
+	char getUserMoveDirection();
 	void display();
 	void reset();
 	void handleWin();
 	void handleLose();
 
 private:
-	Board board;
-	int score = 0;
+	Board m_board;
+	Board m_previousMoveBoards;
+	
 	std::ostream& m_displayDevice;
+	std::istream& m_inputDevice;
 };
 
 #endif // GAME_H

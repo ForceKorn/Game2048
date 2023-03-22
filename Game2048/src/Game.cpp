@@ -3,22 +3,31 @@
 #include <iostream>
 #include <string>
 
-Game::Game(std::ostream& display)
-	: board(), score(0), m_displayDevice(display) {}
+Game::Game(std::ostream& display, std::istream& keyboard)
+	: m_board(), m_displayDevice(display), m_inputDevice(keyboard) {}
 
 void Game::run() 
 {
 	reset();
 	display();
-
-	while (board.canMove())
+	
+	while (m_board.canMove())
 	{
-		const int direction = handleInput();
-		board.move(direction);
+		const char direction = getUserMoveDirection();
+		if (direction == 'r')
+		{
+			m_board = m_previousMoveBoards;
+			m_previousMoveBoards = m_board;
+			display();
+			continue;
+		}
+
+		m_previousMoveBoards = m_board;
+		m_board.move(direction);
 		display();
 
-		const bool isFull = board.isFull();
-		const bool isVictory = board.containsValue(2048);
+		const bool isFull = m_board.isFull();
+		const bool isVictory = m_board.containsValue(2048);
 		if (isVictory)
 		{
 			handleWin();
@@ -37,23 +46,22 @@ void Game::display()
 {
 	system("cls"); // clear console
 
-	m_displayDevice << "Score: " << score << '\n';
-	board.display(m_displayDevice);
+	m_displayDevice << "Score: " << m_board.getScore() << '\n';
+	m_board.display(m_displayDevice);
 }
 
-char Game::handleInput()
+char Game::getUserMoveDirection()
 {
-	m_displayDevice << "Enter a move (w/a/s/d): ";
+	m_displayDevice << "Enter a move (w/a/s/d) or (r) to restore last move: ";
 	
 	std::string input;
-	std::getline(std::cin, input);
+	std::getline(m_inputDevice, input);
 	return input.empty() ? 0 : input.front();
 }
 
 void Game::reset() 
 {
-	board.reset();
-	score = 0;
+	m_board.reset();
 }
 
 void Game::handleWin() 

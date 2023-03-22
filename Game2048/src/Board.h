@@ -17,6 +17,7 @@ public:
 	bool isFull() const;
 	bool move(char direction);
 	bool containsValue(int value) const;
+	int getScore() const;
 
 private:
 	void addRandomTile();
@@ -26,7 +27,8 @@ private:
 	bool moveDown();
 
 private:
-	int tiles[BOARD_SIZE][BOARD_SIZE];
+	int m_tiles[BOARD_SIZE][BOARD_SIZE]; // make variable
+	int m_score = 0;
 };
 
 #endif // BOARD_H

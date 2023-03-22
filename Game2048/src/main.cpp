@@ -5,7 +5,9 @@
 int main() 
 {
 	std::ostream& display = std::cout;
-	Game game(display);
+	std::istream& keyboard = std::cin;
+	
+	Game game(display, keyboard);
 	game.run();
 
 	system("pause");

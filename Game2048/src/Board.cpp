@@ -5,8 +5,8 @@
 #include <iomanip>
 #include <vector>
 
-bool updateColumnUp(int* column, int columnSize);
-bool updateColumnDown(int* column, int columnSize);
+std::pair<bool, int> shiftToBegin(int* column, int columnSize);
+std::pair<bool, int> shiftToEnd(int* column, int columnSize);
 constexpr auto isNonEmpty = [] (int number) { return number != 0; };
 
 Board::Board() 
@@ -20,7 +20,7 @@ void Board::reset()
 	{
 		for (int j = 0; j < BOARD_SIZE; ++j) 
 		{
-			tiles[i][j] = 0;
+			m_tiles[i][j] = 0;
 		}
 	}
 
@@ -35,7 +35,20 @@ void Board::display(std::ostream& display) const
 	{
 		for (int j = 0; j < BOARD_SIZE; ++j) 
 		{
-			display << std::setw(4) << tiles[i][j] << "\t";
+			//display << std::setw(4) << m_tiles[i][j] << "\t";
+			
+			display << std::setw(4);
+			
+			const int value = m_tiles[i][j];
+			if (value)
+			{
+				display << value;
+			}
+			else
+			{
+				display << ' ';
+			}
+			display << "\t";
 		}
 		display << '\n';
 	}
@@ -47,7 +60,7 @@ bool Board::isFull() const
 	{
 		for (int j = 0; j < BOARD_SIZE; ++j) 
 		{
-			if (!tiles[i][j])
+			if (!m_tiles[i][j])
 			{
 				return false;
 			}
@@ -56,17 +69,18 @@ bool Board::isFull() const
 	return true;
 }
 
+// test
 bool Board::canMove() const 
 {
 	// Check if there are any empty tiles
 	if (!isFull()) { return true; }
 
-	// Check if still has move on full board
+	// Check if still has move on full board // not working ?
 	for (int i = 0; i < BOARD_SIZE; ++i)
 	{
 		for (int j = 1; j < BOARD_SIZE; ++j)
 		{
-			if (tiles[i][j - 1] == tiles[i][j]) { return true; }
+			if (m_tiles[i][j - 1] == m_tiles[i][j]) { return true; }
 		}
 	}
 	
@@ -74,7 +88,7 @@ bool Board::canMove() const
 	{
 		for (int j = 0; j < BOARD_SIZE; ++j)
 		{
-			if (tiles[i - 1][j] == tiles[i][j]) { return true; }
+			if (m_tiles[i - 1][j] == m_tiles[i][j]) { return true; }
 		}
 	}
 	
@@ -123,6 +137,12 @@ bool Board::move(char direction)
 	return isContentMoved;
 }
 
+int Board::getScore() const
+{
+	return m_score;
+}
+
+// random device
 void Board::addRandomTile() 
 {
 	if (isFull()) { return; }
@@ -131,9 +151,9 @@ void Board::addRandomTile()
 	do {
 		rowIndex	= rand() % BOARD_SIZE;
 		columnIndex = rand() % BOARD_SIZE;
-	} while (tiles[rowIndex][columnIndex]);
+	} while (m_tiles[rowIndex][columnIndex]);
 
-	tiles[rowIndex][columnIndex] = 2 + (rand() & 1) * 2;
+	m_tiles[rowIndex][columnIndex] = 2 + (rand() & 1) * 2;
 }
 
 bool Board::moveLeft() 
@@ -143,9 +163,13 @@ bool Board::moveLeft()
 	int cache[BOARD_SIZE] = { 0 };
 	for (int i = 0; i < BOARD_SIZE; ++i)
 	{
-		for (int j = 0; j < BOARD_SIZE; ++j) { cache[j] = tiles[i][j]; }
-		isMoved |= updateColumnUp(cache, BOARD_SIZE);
-		for (int j = 0; j < BOARD_SIZE; ++j) { tiles[i][j] = cache[j]; }
+		for (int j = 0; j < BOARD_SIZE; ++j) { cache[j] = m_tiles[i][j]; }
+
+		const auto [moved, scored] = shiftToBegin(cache, BOARD_SIZE);
+		isMoved |= moved;
+		m_score += scored;
+
+		for (int j = 0; j < BOARD_SIZE; ++j) { m_tiles[i][j] = cache[j]; }
 	}
 	return isMoved;
 }
@@ -157,9 +181,12 @@ bool Board::moveRight()
 	int cache[BOARD_SIZE] = { 0 };
 	for (int i = 0; i < BOARD_SIZE; ++i)
 	{
-		for (int j = 0; j < BOARD_SIZE; ++j) { cache[j] = tiles[i][j]; }
-		isMoved |= updateColumnDown(cache, BOARD_SIZE);
-		for (int j = 0; j < BOARD_SIZE; ++j) { tiles[i][j] = cache[j]; }
+		for (int j = 0; j < BOARD_SIZE; ++j) { cache[j] = m_tiles[i][j]; }
+		const auto [moved, scored] = shiftToEnd(cache, BOARD_SIZE);
+		isMoved |= moved;
+		m_score += scored;
+
+		for (int j = 0; j < BOARD_SIZE; ++j) { m_tiles[i][j] = cache[j]; }
 	}
 	return isMoved;
 }
@@ -171,9 +198,13 @@ bool Board::moveUp()
 	int cache[BOARD_SIZE] = { 0 };
 	for (int j = 0; j < BOARD_SIZE; ++j)
 	{
-		for (int i = 0; i < BOARD_SIZE; ++i) { cache[i] = tiles[i][j]; }
-		isMoved |= updateColumnUp(cache, BOARD_SIZE);
-		for (int i = 0; i < BOARD_SIZE; ++i) { tiles[i][j] = cache[i]; }
+		for (int i = 0; i < BOARD_SIZE; ++i) { cache[i] = m_tiles[i][j]; }
+		
+		const auto [moved, scored] = shiftToBegin(cache, BOARD_SIZE);
+		isMoved |= moved;
+		m_score += scored;
+
+		for (int i = 0; i < BOARD_SIZE; ++i) { m_tiles[i][j] = cache[i]; }
 	}
 	return isMoved;
 }
@@ -185,9 +216,13 @@ bool Board::moveDown()
 	int cache[BOARD_SIZE] = { 0 };
 	for (int j = 0; j < BOARD_SIZE; ++j)
 	{
-		for (int i = 0; i < BOARD_SIZE; ++i) { cache[i] = tiles[i][j]; }
-		isMoved |= updateColumnDown(cache, BOARD_SIZE);
-		for (int i = 0; i < BOARD_SIZE; ++i) { tiles[i][j] = cache[i]; }
+		for (int i = 0; i < BOARD_SIZE; ++i) { cache[i] = m_tiles[i][j]; }
+
+		const auto [moved, scored] = shiftToEnd(cache, BOARD_SIZE);
+		isMoved |= moved;
+		m_score += scored;
+
+		for (int i = 0; i < BOARD_SIZE; ++i) { m_tiles[i][j] = cache[i]; }
 	}
 	return isMoved;
 }
@@ -198,7 +233,7 @@ bool Board::containsValue(int value) const
 	{
 		for (int j = 0; j < BOARD_SIZE; j++) 
 		{
-			if (tiles[i][j] == value) 
+			if (m_tiles[i][j] == value) 
 			{
 				return true;
 			}
@@ -207,13 +242,14 @@ bool Board::containsValue(int value) const
 	return false;
 }
 
-bool updateColumnUp(int* cahcedMatrixSlice, int columnSize) // rename, make common ?
+std::pair<bool, int> shiftToBegin(int* cahcedMatrixSlice, int columnSize) // make common implementation
 {
 	// Remove in between zeros
 	std::vector<int> result(columnSize, 0);
 	std::copy_if(cahcedMatrixSlice, cahcedMatrixSlice + columnSize, result.begin(), isNonEmpty);
 
 	// Accumulate from front
+	int scorePerShift = 0;
 	for (auto it = result.begin() + 1; it != result.end(); ++it)
 	{
 		const auto prev = it - 1;
@@ -222,6 +258,7 @@ bool updateColumnUp(int* cahcedMatrixSlice, int columnSize) // rename, make comm
 		{
 			*prev *= 2; *it = 0;
 			it += (next != result.end());
+			scorePerShift += *prev;
 		}
 	}
 
@@ -244,28 +281,31 @@ bool updateColumnUp(int* cahcedMatrixSlice, int columnSize) // rename, make comm
 	// Write back
 	std::fill(cahcedMatrixSlice, cahcedMatrixSlice + columnSize, 0);
 	std::copy(result.begin(), result.end(), cahcedMatrixSlice);
-	return isMoved;
+	return { isMoved, scorePerShift };
 }
 
-bool updateColumnDown(int* cahcedMatrixSlice, int columnSize) // rename, make common ?
+std::pair<bool, int> shiftToEnd(int* cahcedMatrixSlice, int columnSize) // make common implementation
 {
-	// Remove in between zeros
+	// removeEmptyCells(int* cahcedMatrixSlice, int columnSize) -> std::vector<int>
 	std::vector<int> result(columnSize, 0);
 	std::copy_if(cahcedMatrixSlice, cahcedMatrixSlice + columnSize, result.begin(), isNonEmpty);
 				
-	// Accumulate from back
+	// calcScore(begin, end) -> int
+	int scorePerShift = 0;
 	for (auto it = result.rbegin() + 1; it != result.rend(); ++it)
 	{
+		// mergeWithSame(auto currentIter, auto lastIter) -> int
 		const auto prev = it - 1;
 		const auto next = it + 1;
 		if ((*prev == *it) && isNonEmpty(*it))
 		{
 			*prev *= 2; *it = 0;
 			it += (next != result.rend());
+			scorePerShift += *prev;
 		}
 	}
 
-	// Shift to back
+	// shiftToSide(auto begin, auto end) -> void
 	for (auto it = result.rbegin() + 1; it != result.rend(); ++it)
 	{
 		const auto prev = it - 1;
@@ -278,11 +318,11 @@ bool updateColumnDown(int* cahcedMatrixSlice, int columnSize) // rename, make co
 		}
 	}
 
-	// Save Calculate 
+	// 
 	const bool isMoved = !std::equal(result.begin(), result.end(), cahcedMatrixSlice);
 
-	// Write back
+	// copyRow Write back
 	std::fill(cahcedMatrixSlice, cahcedMatrixSlice + columnSize, 0);
 	std::copy(result.begin(), result.end(), cahcedMatrixSlice);
-	return isMoved;
+	return { isMoved, scorePerShift };
 }
