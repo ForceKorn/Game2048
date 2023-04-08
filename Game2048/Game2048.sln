@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.33130.400
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game2048", "Game2048.vcxproj", "{8B4428B0-3F36-42FB-A31E-AD9F3C4569BE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game2048GoogleTest", "..\Game2048GoogleTest\Game2048GoogleTest.vcxproj", "{D73C42E1-7047-4CD0-A9AA-7919B0214D43}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{8B4428B0-3F36-42FB-A31E-AD9F3C4569BE}.Release|x64.Build.0 = Release|x64
 		{8B4428B0-3F36-42FB-A31E-AD9F3C4569BE}.Release|x86.ActiveCfg = Release|Win32
 		{8B4428B0-3F36-42FB-A31E-AD9F3C4569BE}.Release|x86.Build.0 = Release|Win32
+		{D73C42E1-7047-4CD0-A9AA-7919B0214D43}.Debug|x64.ActiveCfg = Debug|x64
+		{D73C42E1-7047-4CD0-A9AA-7919B0214D43}.Debug|x64.Build.0 = Debug|x64
+		{D73C42E1-7047-4CD0-A9AA-7919B0214D43}.Debug|x86.ActiveCfg = Debug|Win32
+		{D73C42E1-7047-4CD0-A9AA-7919B0214D43}.Debug|x86.Build.0 = Debug|Win32
+		{D73C42E1-7047-4CD0-A9AA-7919B0214D43}.Release|x64.ActiveCfg = Release|x64
+		{D73C42E1-7047-4CD0-A9AA-7919B0214D43}.Release|x64.Build.0 = Release|x64
+		{D73C42E1-7047-4CD0-A9AA-7919B0214D43}.Release|x86.ActiveCfg = Release|Win32
+		{D73C42E1-7047-4CD0-A9AA-7919B0214D43}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

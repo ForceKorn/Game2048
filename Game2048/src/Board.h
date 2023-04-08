@@ -19,6 +19,8 @@ public:
 	bool containsValue(int value) const;
 	int getScore() const;
 
+	void setBoard(const int* const data); // created for Google tests only
+
 private:
 	void addRandomTile();
 	bool moveLeft();
@@ -27,7 +29,7 @@ private:
 	bool moveDown();
 
 private:
-	int m_tiles[BOARD_SIZE][BOARD_SIZE]; // make variable
+	int m_tiles[BOARD_SIZE][BOARD_SIZE]; // make variable sizes
 	int m_score = 0;
 };
 

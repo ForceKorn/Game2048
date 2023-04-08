@@ -1,3 +1,12 @@
+//#ToDo
+// 1. Refactor code
+// 1.1 Convert Board cache from int[] to std::array
+// 1.2
+// 2. Add fuzz tests
+// 3. Add sanitizers
+// 4. 
+// 
+
 #include <iostream>
 #include "Game.h"
 

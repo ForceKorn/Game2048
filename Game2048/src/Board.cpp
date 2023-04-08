@@ -35,8 +35,6 @@ void Board::display(std::ostream& display) const
 	{
 		for (int j = 0; j < BOARD_SIZE; ++j) 
 		{
-			//display << std::setw(4) << m_tiles[i][j] << "\t";
-			
 			display << std::setw(4);
 			
 			const int value = m_tiles[i][j];
@@ -48,8 +46,10 @@ void Board::display(std::ostream& display) const
 			{
 				display << ' ';
 			}
-			display << "\t";
+			display << "\t|";
 		}
+		display << '\n';
+		for (int k = 0; k < 2 * BOARD_SIZE * BOARD_SIZE; ++k) { display << "-"; }
 		display << '\n';
 	}
 }
@@ -69,48 +69,23 @@ bool Board::isFull() const
 	return true;
 }
 
-// test
 bool Board::canMove() const 
 {
 	// Check if there are any empty tiles
 	if (!isFull()) { return true; }
 
-	// Check if still has move on full board // not working ?
+	// Check if still has move on full board
+	const int k_edgeTreshold = BOARD_SIZE - 1;
 	for (int i = 0; i < BOARD_SIZE; ++i)
 	{
 		for (int j = 1; j < BOARD_SIZE; ++j)
 		{
-			if (m_tiles[i][j - 1] == m_tiles[i][j]) { return true; }
+			if ((i > 1)				 && (m_tiles[i][j] == m_tiles[i - 1][j])) { return true; }
+			if ((j > 1)			     && (m_tiles[i][j] == m_tiles[i][j - 1])) { return true; }
+			if ((i < k_edgeTreshold) && (m_tiles[i][j] == m_tiles[i + 1][j])) { return true; }
+			if ((j < k_edgeTreshold) && (m_tiles[i][j] == m_tiles[i][j + 1])) { return true; }
 		}
 	}
-	
-	for (int i = 1; i < BOARD_SIZE; ++i)
-	{
-		for (int j = 0; j < BOARD_SIZE; ++j)
-		{
-			if (m_tiles[i - 1][j] == m_tiles[i][j]) { return true; }
-		}
-	}
-	
-	/*
-	// Check if any adjacent tiles have the same value
-	for (int i = 0; i < BOARD_SIZE; i++) {
-		for (int j = 0; j < BOARD_SIZE; j++) {
-			if (i > 0 && tiles[i][j].getValue() == tiles[i - 1][j].getValue()) {
-				return true;
-			}
-			if (j > 0 && tiles[i][j].getValue() == tiles[i][j - 1].getValue()) {
-				return true;
-			}
-			if (i < BOARD_SIZE - 1 && tiles[i][j].getValue() == tiles[i + 1][j].getValue()) {
-				return true;
-			}
-			if (j < BOARD_SIZE - 1 && tiles[i][j].getValue() == tiles[i][j + 1].getValue()) {
-				return true;
-			}
-		}
-	}
-	*/
 	return false;
 }
 
@@ -325,4 +300,16 @@ std::pair<bool, int> shiftToEnd(int* cahcedMatrixSlice, int columnSize) // make 
 	std::fill(cahcedMatrixSlice, cahcedMatrixSlice + columnSize, 0);
 	std::copy(result.begin(), result.end(), cahcedMatrixSlice);
 	return { isMoved, scorePerShift };
+}
+
+void Board::setBoard(const int* const data)
+{
+	int k = -1;
+	for (int i = 0; i < BOARD_SIZE; i++)
+	{
+		for (int j = 0; j < BOARD_SIZE; j++)
+		{
+			m_tiles[i][j] = data[++k];
+		}
+	}
 }

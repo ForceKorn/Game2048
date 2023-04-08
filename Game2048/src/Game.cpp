@@ -26,7 +26,7 @@ void Game::run()
 		m_board.move(direction);
 		display();
 
-		const bool isFull = m_board.isFull();
+		const bool noMovesLeft = !m_board.canMove();
 		const bool isVictory = m_board.containsValue(2048);
 		if (isVictory)
 		{
@@ -34,7 +34,7 @@ void Game::run()
 			return;
 		}
 
-		if (isFull)
+		if (noMovesLeft)
 		{
 			handleLose();
 			return;
@@ -56,7 +56,7 @@ char Game::getUserMoveDirection()
 	
 	std::string input;
 	std::getline(m_inputDevice, input);
-	return input.empty() ? 0 : input.front();
+	return input.empty() ? char{ 0 } : input.front();
 }
 
 void Game::reset() 
