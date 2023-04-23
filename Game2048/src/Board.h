@@ -29,7 +29,7 @@ private:
 	bool moveDown();
 
 private:
-	int m_tiles[BOARD_SIZE][BOARD_SIZE]; // make variable sizes
+	int m_tiles[BOARD_SIZE][BOARD_SIZE] = { 0 }; // make variable sizes
 	int m_score = 0;
 };
 

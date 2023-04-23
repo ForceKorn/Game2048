@@ -3,11 +3,26 @@
 #include <algorithm>
 #include <iostream>
 #include <iomanip>
+#include <random>
 #include <vector>
+
+namespace
+{
+	constexpr int DISTRIBUTION_MINIMUM_VALUE = 1;
+	constexpr int DISTRIBUTION_MAXIMUM_VALUE = 100;
+	constexpr int DISTRIBUTION_SMALLEST_TILE_TRESHOLD = 90;
+
+	std::mt19937 mt {};
+	std::uniform_int_distribution randomizer { DISTRIBUTION_MINIMUM_VALUE, DISTRIBUTION_MAXIMUM_VALUE };
+}
 
 std::pair<bool, int> shiftToBegin(int* column, int columnSize);
 std::pair<bool, int> shiftToEnd(int* column, int columnSize);
 constexpr auto isNonEmpty = [] (int number) { return number != 0; };
+constexpr auto getRandomTile = [] () -> int
+{
+	return 2 + (randomizer(mt) > DISTRIBUTION_SMALLEST_TILE_TRESHOLD) * 2;
+};
 
 Board::Board() 
 {
@@ -128,7 +143,7 @@ void Board::addRandomTile()
 		columnIndex = rand() % BOARD_SIZE;
 	} while (m_tiles[rowIndex][columnIndex]);
 
-	m_tiles[rowIndex][columnIndex] = 2 + (rand() & 1) * 2;
+	m_tiles[rowIndex][columnIndex] = getRandomTile();
 }
 
 bool Board::moveLeft() 
