@@ -3,8 +3,15 @@
 #include <iostream>
 #include <string>
 
-Game::Game(std::ostream& display, std::istream& keyboard)
-	: m_board(), m_displayDevice(display), m_inputDevice(keyboard) {}
+inline constexpr int GAME_WIN_VALUE = 2048;
+inline constexpr int GAME_BOARD_HEIGHT = 5;
+inline constexpr int GAME_BOARD_WIDTH  = 4;
+
+Game::Game(std::ostream& display, std::istream& keyboard) : 
+	m_board(GAME_WIN_VALUE, GAME_BOARD_HEIGHT, GAME_BOARD_WIDTH),
+	m_previousMoveBoards(GAME_WIN_VALUE, GAME_BOARD_HEIGHT, GAME_BOARD_WIDTH),
+	m_displayDevice(display), 
+	m_inputDevice(keyboard) {}
 
 void Game::run() 
 {
@@ -26,14 +33,14 @@ void Game::run()
 		m_board.move(direction);
 		display();
 
-		const bool noMovesLeft = !m_board.canMove();
-		const bool isVictory = m_board.containsValue(2048);
+		const bool isVictory = m_board.reachedVictoryValue();
 		if (isVictory)
 		{
 			handleWin();
 			return;
 		}
 
+		const bool noMovesLeft = !m_board.canMove();
 		if (noMovesLeft)
 		{
 			handleLose();
@@ -44,7 +51,7 @@ void Game::run()
 
 void Game::display()
 {
-	system("cls"); // clear console
+	system("cls");
 
 	m_displayDevice << "Score: " << m_board.getScore() << '\n';
 	m_board.display(m_displayDevice);
@@ -66,7 +73,7 @@ void Game::reset()
 
 void Game::handleWin() 
 {
-	m_displayDevice << "Congratulations! You have reached 2048!\n";
+	m_displayDevice << "Congratulations! You have reached " << GAME_WIN_VALUE << "!\n";
 }
 
 void Game::handleLose() 

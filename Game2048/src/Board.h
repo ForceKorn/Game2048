@@ -2,26 +2,41 @@
 #define BOARD_H
 
 #include <iosfwd>
-
-inline constexpr int BOARD_SIZE = 4;
+#include <vector>
+#include <array>
+#include <span>
+#include <tuple>
 
 class Board 
 {
 public:
-	Board();
+	Board(const int winValue, const int height, const int width);
+	Board(const Board& gameBoard);
+	Board& operator=(const Board& gameBoard);
 
+public:
 	void reset();
 	void display(std::ostream& display) const;
-
 	bool canMove() const;
 	bool isFull() const;
 	bool move(char direction);
-	bool containsValue(int value) const;
+	bool reachedVictoryValue() const;
 	int getScore() const;
 
-	void setBoard(const int* const data); // created for Google tests only
+#ifdef _DEBUG
+public: // For Google Tests
+	void setBoard(const std::span<int> data);
+	bool fuzzyEqual(const std::span<std::tuple<int, bool>> data);
+	friend bool operator==(const Board& lhs, const Board& rhs);
+#endif
 
 private:
+	using Coordinate_t = std::array<size_t, 2>;
+
+private:
+	std::vector<Coordinate_t> getEmptyTilesCoordinates() const;
+	size_t getBoardWidth() const;
+	size_t getBoardHeight() const;
 	void addRandomTile();
 	bool moveLeft();
 	bool moveRight();
@@ -29,7 +44,10 @@ private:
 	bool moveDown();
 
 private:
-	int m_tiles[BOARD_SIZE][BOARD_SIZE] = { 0 }; // make variable sizes
+	const int m_winningValue;
+
+private:
+	std::vector<std::vector<int>> m_tiles;
 	int m_score = 0;
 };
 
